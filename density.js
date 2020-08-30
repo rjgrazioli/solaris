@@ -18,13 +18,13 @@ export function getAnalytics(spaceId) {
 export const getSpaceAnalytics = () => fetch('https://api.density.io/v2/spaces', { headers: { 'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA' } })
   .then(response => response.json())
   .then(data => {
-    console.log("-----Spaces", data);
+    // console.log("-----Spaces", data);
     return data.results;
   })
   .then(async data => {
     await Promise.all(data.map((space, index, array) => {
-      console.log(space.id, ":", space.name);
-      return fetch(`https://api.density.io/v2/spaces/${space.id}/counts`, { headers: { 'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA' } })
+      // console.log(space.id, ":", space.name);
+      return fetch( `https://api.density.io/v2/spaces/${space.id}/counts/?start_time=2020-08-24&end_time=2020-08-29`, { headers: { 'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA' }})
         .then(response => response.json())
         .then(data => {
           array[index] = {...space, ...data};
@@ -32,5 +32,6 @@ export const getSpaceAnalytics = () => fetch('https://api.density.io/v2/spaces',
         });
     }));
 
-  console.log("----Analytics", data);
+  // console.log("----Analytics", data);
+  return data
 });

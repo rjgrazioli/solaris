@@ -86,16 +86,7 @@ const sketch = ({ context }) => {
   sunMesh.scale.setScalar(10);
   scene.add(sunMesh);
 
-  // Create all density spaces
-  density.getSpaceAnalytics();
-  // density.getSpaces().then(data => {
-  //   const allSpaces = data;
-  //   console.log(allSpaces);
-  // });
-  // console.log(density.getAnalytics(allSpaces[0].id));
-
-
-  // create planets
+  // Create planets
   function createPlanet(scene, mesh, group, x, scale) {
     mesh.position.set(x, 0, 0);
     mesh.scale.setScalar(scale);
@@ -105,6 +96,21 @@ const sketch = ({ context }) => {
     scene.add(group);
   }
 
+  // Create all density spaces
+  density.getSpaceAnalytics().then(data => {
+    Object.entries(data).map(([key, value]) => {
+      let spaceName = value.name;
+      let spaceMetrics = value.metrics;
+      // const group = new THREE.Group();
+      // const mesh = new THREE.Mesh(geometry, bubbleMaterial);
+      // createPlanet(scene, mesh, group, value.x_position, value.scale);  
+
+      // return [key, {...value, group, mesh}];
+      return [key, {spaceName, spaceMetrics}];
+    })
+  });
+
+  // console.log(density.getAnalytics(allSpaces[0].id));
   const planets = Object.fromEntries(
     Object.entries(celestialBodies.planets).map(([key, value]) => {
       // const texture = loader.load(value.texture);
