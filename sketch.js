@@ -24,16 +24,7 @@ var SCREEN_HEIGHT = window.innerHeight;
 
 const sketch = ({ context }) => {
 
-  // Gradient foreground
-  // const fill = context.createLinearGradient(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-  // fill.addColorStop(0, 'cyan');
-  // fill.addColorStop(1, 'orange');
-
-  // Fill rectangle
-  // context.fillStyle = fill;
-
   document.body.style.background = "linear-gradient(135deg, #ffd2c1, #f9d0d3)";
-
 
   // Renderer
   // -------------------------------------------------------
@@ -95,11 +86,12 @@ const sketch = ({ context }) => {
   sunMesh.scale.setScalar(10);
   scene.add(sunMesh);
 
-  // Greate all density spaces
-  density.getSpaces().then(data => {
-    const allSpaces = data;
-    console.log(allSpaces)
-  });
+  // Create all density spaces
+  density.getSpaceAnalytics();
+  // density.getSpaces().then(data => {
+  //   const allSpaces = data;
+  //   console.log(allSpaces);
+  // });
   // console.log(density.getAnalytics(allSpaces[0].id));
 
 
