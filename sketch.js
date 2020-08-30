@@ -24,15 +24,23 @@ var SCREEN_HEIGHT = window.innerHeight;
 
 const sketch = ({ context }) => {
 
+  // Gradient foreground
+  // const fill = context.createLinearGradient(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  // fill.addColorStop(0, 'cyan');
+  // fill.addColorStop(1, 'orange');
+
+  // Fill rectangle
+  // context.fillStyle = fill;
+
+  document.body.style.background = "linear-gradient(135deg, #ffd2c1, #f9d0d3)";
+
+
   // Renderer
   // -------------------------------------------------------
   const renderer = new THREE.WebGLRenderer({
     canvas: context.canvas,
     alpha: true,
   });
-
-  // renderer.setClearColor(0x000000, 1);
-  // renderer.setClearColor("pink", 1);
 
 
   // Geometry helpers
