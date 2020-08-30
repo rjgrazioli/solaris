@@ -1,4 +1,3 @@
-//first.js
 const celestialBodies = {
   planets: {
     earth: {

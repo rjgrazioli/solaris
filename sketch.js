@@ -1,9 +1,16 @@
 // Imports & constants
 global.THREE = require("three");
-require("three/examples/js/controls/OrbitControls");
 const canvasSketch = require("canvas-sketch");
+// Controls
+require("three/examples/js/controls/OrbitControls");
+// Effects
+// require("three/examples/js/effects/AsciiEffect.js");
+// Custom setup
+const lighting = require("./lighting.js");
+const blobify = require("./blobify.js");
+// Project resources
 import {celestialBodies} from "./celestialBodies.js";
-import {getSpaces} from "./density.js";
+const density = require("./density.js");
 
 
 const settings = {
@@ -17,66 +24,100 @@ var SCREEN_HEIGHT = window.innerHeight;
 
 const sketch = ({ context }) => {
 
-  // RENDERER
+  // Renderer
+  // -------------------------------------------------------
   const renderer = new THREE.WebGLRenderer({
     canvas: context.canvas,
     alpha: true,
   });
-  renderer.setClearColor("#000000", 1);
 
-  // CAMERA
+  // renderer.setClearColor(0x000000, 1);
+  // renderer.setClearColor("pink", 1);
+
+
+  // Geometry helpers
+  // -------------------------------------------------------
+  // scene.add(new THREE.PointLightHelper(light, 1));
+  // scene.add(new THREE.GridHelper(50, 50));
+
+  // Effects
+  // -------------------------------------------------------
+  // None
+
+  // Camera
+  // -------------------------------------------------------
   const camera = new THREE.PerspectiveCamera(50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 1000);
-  camera.position.set(-20, 10, 30);
+  camera.position.set(-20, 100, 100);
 
-  // ORBIT CONTROLS
+  // Orbit Control
+  // -------------------------------------------------------
   const controls = new THREE.OrbitControls(camera, context.canvas);
   controls.target.set(30, 0, 0);
   
-  // SCENE
+  // Scene
+  // -------------------------------------------------------
   const scene = new THREE.Scene();
 
-  // TEXTURES
+  // Textures
+  // -------------------------------------------------------
   const loader = new THREE.TextureLoader();
   const sunTexture = loader.load(celestialBodies.sun.texture);
 
-  // MATERIALS
-  const sunMaterial = new THREE.MeshStandardMaterial({ map: sunTexture });
+  // Materials
+  // -------------------------------------------------------
+  const sunMaterial = new THREE.MeshStandardMaterial({
+    map: sunTexture
+  });
+  const bubbleMaterial = new THREE.MeshStandardMaterial({
+    emissive: 0xbd4be3,
+    emissiveIntensity: 0.5,
+    roughness: 0.61,
+    metalness: 0.21,
+    side: THREE.FrontSide,
+    //wireframe: true
+  });
 
-  // MESHES
-  const geometry = new THREE.SphereGeometry(1, 32, 16);
+  // Meshes
+  // -------------------------------------------------------
+  const geometry = new THREE.SphereGeometry(1, 40, 40);
 
   // add the sun
-  const sunMesh = new THREE.Mesh(geometry, sunMaterial);
+  const sunMesh = new THREE.Mesh(geometry, bubbleMaterial);
   sunMesh.position.set(0, 0, 0);
   sunMesh.scale.setScalar(10);
   scene.add(sunMesh);
 
+  // Greate all density spaces
+  density.getSpaces().then(data => {
+    const allSpaces = data;
+    console.log(allSpaces)
+  });
+  // console.log(density.getAnalytics(allSpaces[0].id));
+
+
   // create planets
-  console.log(getSpaces());
+  function createPlanet(scene, mesh, group, x, scale) {
+    mesh.position.set(x, 0, 0);
+    mesh.scale.setScalar(scale);
+    mesh.castShadow = true;
+    mesh.receiveShadow = false;
+    group.add(mesh);
+    scene.add(group);
+  }
 
   const planets = Object.fromEntries(
     Object.entries(celestialBodies.planets).map(([key, value]) => {
-      const texture = loader.load(value.texture);
-      const material = new THREE.MeshStandardMaterial({ map: texture });
+      // const texture = loader.load(value.texture);
+      // const material = new THREE.MeshStandardMaterial({ map: texture });
       const group = new THREE.Group();
-      const mesh = new THREE.Mesh(geometry, material);
+      const mesh = new THREE.Mesh(geometry, bubbleMaterial);
       createPlanet(scene, mesh, group, value.x_position, value.scale);  
 
       return [key, {...value, group, mesh}];
     })
   );
 
-  // LIGHTING
-  const light = new THREE.PointLight("white", 1.25);
-  light.position.set(0, 0, 0);
-  scene.add(light);
-
-  // illuminate the sun
-  createSpotlights(scene);
-
-  // HELPERS
-  scene.add(new THREE.PointLightHelper(light, 1));
-  // scene.add(new THREE.GridHelper(50, 50));
+  lighting.createLights(scene);
   
   return {
     render({ time }) {
@@ -84,8 +125,9 @@ const sketch = ({ context }) => {
       for (var planet in planets) {
         planets[planet].group.rotation.y = time * planets[planet].solar_rotation;
         planets[planet].mesh.rotation.y = time * planets[planet].planet_rotation;
+        blobify.light(planets[planet].mesh, 1, time);
       }
-
+      
       controls.update();
       renderer.render(scene, camera);
     },
@@ -96,32 +138,5 @@ const sketch = ({ context }) => {
     }
   };
 };
-
-function createPlanet(scene, mesh, group, x, scale) {
-  mesh.position.set(x, 0, 0);
-  mesh.scale.setScalar(scale);
-  group.add(mesh);
-  scene.add(group);
-}
-
-// generate spotlights on all sides like a cube.
-function createSpotlights(scene) {
-  var color = 0xFFFFFF;
-  var intensity = 5;
-  var distance = 25;
-  var angle = Math.PI/7;
-
-  new Array(6).fill('').forEach((item, i) => {
-    var spotlight = new THREE.SpotLight(color, intensity, distance, angle);
-    var value = i % 2 === 0 ? 25 : -25;
-
-    spotlight.position.set(
-      i < 2 ? value : 0,
-      i >= 2 && i < 4 ? value : 0,
-      i >= 4 ? value : 0
-    );
-    scene.add( spotlight );
-  });
-}
 
 canvasSketch(sketch, settings);

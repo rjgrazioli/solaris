@@ -1,22 +1,16 @@
-const request = require('request');
+export const getSpaces = () => fetch('https://api.density.io/v2/spaces', { headers: { 'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA' } })
+  .then(response => response.json())
+  .then((responseData) => {
+    return responseData.results;
+  })
+  .catch(error => console.warn(error));
 
-const getSpaces = () => {
-  const options = {
-    url: 'https://api.density.io/v2/spaces',
-    headers: {
-      'User-Agent': 'request',
-      'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA'
-    }
-  };
-  
-  function callback(error, response, body) {
-    if (!error && response.statusCode == 200) {
-      const response = JSON.parse(body);
-      return response;
-    }
-  }
-
-  return request(options, callback);
-};
-
-export { getSpaces };
+export function getAnalytics(spaceId) {
+  fetch('https://api.density.io/v2/${spaceId}/counts', { headers: { 'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA' } })
+  .then(response => response.json())
+  .then((responseData) => {
+    // console.log(responseData);
+    return responseData;
+  })
+  .catch(error => console.warn(error));
+}
