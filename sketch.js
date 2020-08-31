@@ -97,18 +97,14 @@ const sketch = ({ context }) => {
   }
 
   // Create all density spaces
-  density.getSpaceAnalytics().then(data => {
-    Object.entries(data).map(([key, value]) => {
-      let spaceName = value.name;
-      let spaceMetrics = value.metrics;
-      // const group = new THREE.Group();
-      // const mesh = new THREE.Mesh(geometry, bubbleMaterial);
-      // createPlanet(scene, mesh, group, value.x_position, value.scale);  
-
-      // return [key, {...value, group, mesh}];
-      return [key, {spaceName, spaceMetrics}];
-    })
-  });
+  async function asyncCall() {
+    console.log('calling');
+    const allSpaces = await density.getSpaceAnalytics();
+    console.log(allSpaces);
+    // expected output: "resolved"
+  }
+  asyncCall();
+  
 
   // console.log(density.getAnalytics(allSpaces[0].id));
   const planets = Object.fromEntries(

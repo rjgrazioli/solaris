@@ -1,9 +1,22 @@
-export const getSpaces = () => fetch('https://api.density.io/v2/spaces', { headers: { 'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA' } })
-  .then(response => response.json())
-  .then((responseData) => {
-    return responseData.results;
-  })
-  .catch(error => console.warn(error));
+const request = require('request')
+
+export const getSpaces = () => {
+  let allSpaces;
+  request({
+    url: 'https://api.density.io/v2/spaces',
+    headers: {'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA'}},
+    function (error, response, body) {
+      if (!error && response.statusCode == 200) {}
+      let data = JSON.parse(body);
+      allSpaces = data.results;
+    }
+  );
+  console.log(allSpaces);
+
+  return new Promise(resolve => {
+    resolve(allSpaces);
+  });
+}
 
 export function getAnalytics(spaceId) {
   fetch('https://api.density.io/v2/${spaceId}/counts', { headers: { 'Authorization': 'Bearer tok_Gj4NFeMxCtg62gZeDvsgygVy6elahJyE2m6owBA9VCA' } })
